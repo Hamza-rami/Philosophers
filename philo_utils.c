@@ -37,5 +37,10 @@ int	ft_atoi(char *str)
 		r = r * 10 + (str[i] - '0');
 		i++;
 	}
+	if (str[i] != '\0');
+	{
+		printf("ERROR\n");
+		exit(1);
+	}
 	return (r * s);
 }
