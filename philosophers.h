@@ -15,14 +15,16 @@
 
 typedef struct s_philo
 {
-    int             id;
-    int             meals_eaten;
-    long long       last_meal;
-    pthread_t       thread;
+    int id;
+    int meals_eaten;
+    long long last_meal;
+    pthread_mutex_t meal_lock;
+    pthread_t thread;
     pthread_mutex_t *left_fork;
     pthread_mutex_t *right_fork;
-    struct s_rules  *rules;
+    struct s_rules *rules;
 } t_philo;
+
 
 typedef struct s_rules
 {
@@ -35,8 +37,12 @@ typedef struct s_rules
     long long       start_time;
     pthread_mutex_t *forks;
     pthread_mutex_t print_lock;
+    int             is_dead;
+    pthread_mutex_t death_lock;
     t_philo         *philos;
 } t_rules;
 
+
+int	ft_atoi(char *str);
 
 #endif
