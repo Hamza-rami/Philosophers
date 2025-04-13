@@ -57,54 +57,69 @@ void init_forks_and_philos(t_rules *rules)
 		rules->philos[i].id = i + 1;
 		rules->philos[i].left_fork = &rules->forks[i];
 		rules->philos[i].right_fork = &rules->forks[(i + 1) % rules->nb_philo];
-		rules->philos[i].meals_eaten = 0;
 		rules->philos[i].last_meal = timestamp(rules);
         rules->philos[i].rules = rules;
 		i++;
 	}
 	pthread_mutex_init(&rules->print_lock, NULL);
 	pthread_mutex_init(&rules->meals_lock, NULL);
+    pthread_mutex_init(&rules->eat_mutex, NULL);
 }
 
 void *philo_routine(void *arg)
 {
     t_philo *philo = (t_philo *)arg;
 
-    if (!philo || !philo->rules)
-    {
-        printf("Invalid philosopher or rules pointer\n");
-        return (NULL);
-    }
     while (!philo->rules->someone_died)
-    {   
+    {  
         pthread_mutex_lock(&philo->rules->print_lock);
+        if (philo->rules->someone_died)
+        {
+            pthread_mutex_unlock(&philo->rules->print_lock);
+            return (NULL);
+        }
         printf("%lld ms %d is thinking\n", timestamp(philo->rules), philo->id);
         pthread_mutex_unlock(&philo->rules->print_lock);
         pthread_mutex_lock(philo->left_fork);
-        pthread_mutex_lock(philo->right_fork);
-        philo->last_meal = timestamp(philo->rules);
+        pthread_mutex_lock(philo->right_fork); 
         pthread_mutex_lock(&philo->rules->print_lock);
+        if (philo->rules->someone_died)
+        {
+            pthread_mutex_unlock(philo->left_fork);
+            pthread_mutex_unlock(philo->right_fork);
+            pthread_mutex_unlock(&philo->rules->print_lock);
+            return (NULL);
+        }
+        philo->last_meal = timestamp(philo->rules);
         printf("%lld ms %d is eating\n", philo->last_meal, philo->id);
-        pthread_mutex_lock(&philo->rules->meals_lock);
+        pthread_mutex_lock(&philo->rules->eat_mutex);
         philo->rules->tottal_eat++;
+        pthread_mutex_unlock(&philo->rules->eat_mutex);
         if (philo->rules->tottal_eat == philo->rules->nb_philo * philo->rules->must_eat)
         {
-            printf("%d\n", philo->rules->tottal_eat);
-            exit(0);
+            pthread_mutex_unlock(philo->left_fork);
+            pthread_mutex_unlock(philo->right_fork);
+            pthread_mutex_unlock(&philo->rules->print_lock);
+            return (NULL);
         }
-        pthread_mutex_unlock(&philo->rules->meals_lock);
         pthread_mutex_unlock(&philo->rules->print_lock);
         usleep(philo->rules->time_to_eat * 1000);
-        philo->meals_eaten++;
         pthread_mutex_unlock(philo->left_fork);
         pthread_mutex_unlock(philo->right_fork);
         pthread_mutex_lock(&philo->rules->print_lock);
+        if (philo->rules->someone_died)
+        {
+            pthread_mutex_unlock(&philo->rules->print_lock);
+            return (NULL);
+        }
         printf("%lld ms %d is sleeping\n", timestamp(philo->rules), philo->id);
         pthread_mutex_unlock(&philo->rules->print_lock);
+
         usleep(philo->rules->time_to_sleep * 1000);
     }
     return (NULL);
 }
+
 
 
 void *monitor(void *arg)
@@ -124,8 +139,8 @@ void *monitor(void *arg)
             {
                 pthread_mutex_lock(&rules->print_lock);
                 printf("%lld %d died\n", current_time, rules->philos[i].id);
-                rules->someone_died = 1;
                 pthread_mutex_unlock(&rules->print_lock);
+                rules->someone_died = 1;
                 return (NULL);
             }
             i++;
@@ -173,6 +188,8 @@ int main(int ac, char *av[])
         i++;
     }
     pthread_mutex_destroy(&rules.print_lock);
+    pthread_mutex_destroy(&rules.eat_mutex);
+    pthread_mutex_destroy(&rules.meals_lock);
     free(rules.forks);
     free(rules.philos);
     return (0);
