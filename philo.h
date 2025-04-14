@@ -1,5 +1,5 @@
-#ifndef PHILOSOPHERS_H
-# define PHILOSOPHERS_H
+#ifndef PHILO_H
+# define PHILO_H
 
 # include <unistd.h>
 # include <stdbool.h>
@@ -32,6 +32,8 @@ typedef struct s_rules
 	pthread_mutex_t *forks;
 	pthread_mutex_t print_lock;
 	pthread_mutex_t eat_mutex;
+	pthread_mutex_t if_died;
+	pthread_mutex_t died;
 	t_philo         *philos;
 } t_rules;
 

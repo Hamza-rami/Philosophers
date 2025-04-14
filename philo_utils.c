@@ -1,4 +1,4 @@
-#include    "philosophers.h"
+#include    "philo.h"
 
 static void	ft_skip(char const *str, int *s, int *i)
 {
