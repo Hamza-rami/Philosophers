@@ -16,6 +16,7 @@ typedef struct s_philo
 	pthread_mutex_t *left_fork;
 	pthread_mutex_t *right_fork;
 	struct s_rules  *rules;
+	int				n_eat;
 } t_philo;
 
 typedef struct s_rules
