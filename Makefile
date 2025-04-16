@@ -1,10 +1,10 @@
 NAME = philo
 
-SRC = philo_utils.c philo.c
+SRC = philo_utils.c philo.c utils.c
 
 INC = philo.h
 OBJS = ${SRC:.c=.o}
-CC = cc -Wall -Werror -Wextra   -g3 -fsanitize=thread
+CC = cc -Wall -Werror -Wextra # -g3 -fsanitize=thread
 RM = rm -f
 
 all: ${NAME}
