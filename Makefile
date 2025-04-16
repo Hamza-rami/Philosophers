@@ -1,15 +1,15 @@
-NAME = philo
+NAME = phillo
 
-SRC = philo_utils.c philo.c utils.c
+SRC = philo/philo_utils.c philo/philo.c philo/utils.c philo/monitor.c
 
-INC = philo.h
+INC = philo/philo.h
 OBJS = ${SRC:.c=.o}
 CC = cc -Wall -Werror -Wextra # -g3 -fsanitize=thread
 RM = rm -f
 
 all: ${NAME}
 
-%.o: %.c ${INC}
+philo/%.o: philo/%.c ${INC}
 	${CC} -c $< -o $@
 
 ${NAME}: ${OBJS}

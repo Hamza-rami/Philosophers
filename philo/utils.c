@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 19:56:58 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/15 19:58:51 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/16 10:52:39 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,5 +98,22 @@ int	take_fork(t_philo *philo, pthread_mutex_t **first, pthread_mutex_t **second)
 		pthread_mutex_unlock(*first);
 		return (0);
 	}
+	return (1);
+}
+
+int	destroy_and_free(t_rules *rules)
+{
+	int	i;
+
+	i = 0;
+	while (i < rules->nb_philo)
+		pthread_mutex_destroy(&rules->forks[i++]);
+	pthread_mutex_destroy(&rules->print_lock);
+	pthread_mutex_destroy(&rules->eat_mutex);
+	pthread_mutex_destroy(&rules->meals_lock);
+	pthread_mutex_destroy(&rules->if_died);
+	pthread_mutex_destroy(&rules->died);
+	free(rules->forks);
+	free(rules->philos);
 	return (1);
 }
