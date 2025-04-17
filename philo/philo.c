@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 19:11:55 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/16 10:52:37 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/16 13:32:14 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,12 +83,25 @@ int	start_simulation(t_rules *rules)
 	return (destroy_and_free(rules));
 }
 
+int	handle_1(t_rules *rules)
+{
+	long long	time;
+
+	time = timestamp(rules) - rules->start_time;
+	printf("%lld %d has take a fork\n", time, 1);
+	usleep(rules->time_to_die * 1000);
+	printf("%lld %d died\n", timestamp(rules) - rules->start_time, 1);
+	return (0);
+}
+
 int	main(int ac, char *av[])
 {
 	t_rules		rules;
 
 	if (!(init_rules(ac, av, &rules)))
 		return (1);
+	if (rules.nb_philo == 1)
+		return (handle_1(&rules));
 	if (!(init_forks_and_philos(&rules)))
 		return (1);
 	if (!start_simulation(&rules))

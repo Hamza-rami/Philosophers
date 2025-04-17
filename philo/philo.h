@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 18:55:06 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/16 10:03:34 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/16 11:46:54 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ typedef struct s_rules
 	int				time_to_sleep;
 	int				must_eat;
 	int				someone_died;
-	int				tottal_eat;
 	long long		time_to_die;
 	long long		start_time;
 	pthread_mutex_t	meals_lock;

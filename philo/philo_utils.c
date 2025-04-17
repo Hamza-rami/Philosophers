@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 19:00:12 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/16 10:52:35 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/16 11:46:50 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@ int	help_init_rules(int ac, char *av[], t_rules *rules)
 	gettimeofday(&tv, NULL);
 	rules->start_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
 	rules->someone_died = 0;
-	rules->tottal_eat = 0;
 	return (1);
 }
 
