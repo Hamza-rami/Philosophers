@@ -45,5 +45,9 @@ typedef struct s_rules
 }	t_rules;
 
 long long	timestamp(t_rules *rules);
+void	print(char *str, t_philo *philo);
+void	cleanup(t_rules *rules);
+void	wait_processes(t_rules *rules);
+int	ft_atoi(char *str);
 
 #endif

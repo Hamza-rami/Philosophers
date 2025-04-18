@@ -6,26 +6,25 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 19:11:55 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/16 13:32:14 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/18 15:23:59 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	help_philo_routine(t_philo *philo, pthread_mutex_t **first,
-	pthread_mutex_t **second)
+int	help_philo_routine(t_philo *philo)
 {
 	if (!check_if_died(philo))
 		return (0);
-	if (!take_fork(philo, first, second))
+	if (!take_fork(philo))
 		return (0);
 	pthread_mutex_lock(&philo->rules->eat_mutex);
 	philo->last_meal = timestamp(philo->rules);
 	philo->n_eat++;
 	if (!print_status(philo, "is eating"))
 	{
-		pthread_mutex_unlock(*second);
-		pthread_mutex_unlock(*first);
+		pthread_mutex_unlock(philo->left_fork);
+		pthread_mutex_unlock(philo->right_fork);
 		return (0);
 	}
 	pthread_mutex_unlock(&philo->rules->eat_mutex);
@@ -35,22 +34,18 @@ int	help_philo_routine(t_philo *philo, pthread_mutex_t **first,
 void	*philo_routine(void *arg)
 {
 	t_philo			*philo;
-	pthread_mutex_t	*first;
-	pthread_mutex_t	*second;
 
 	philo = (t_philo *)arg;
-	first = NULL;
-	second = NULL;
 	while (1)
 	{
 		if (philo->rules->must_eat != -1
 			&& philo->n_eat >= philo->rules->must_eat)
 			break ;
-		if (!help_philo_routine(philo, &first, &second))
+		if (!help_philo_routine(philo))
 			return (NULL);
 		usleep(philo->rules->time_to_eat * 1000);
-		pthread_mutex_unlock(second);
-		pthread_mutex_unlock(first);
+		pthread_mutex_unlock(philo->left_fork);
+		pthread_mutex_unlock(philo->right_fork);
 		if (!print_status(philo, "is sleeping"))
 			return (NULL);
 		usleep(philo->rules->time_to_sleep * 1000);

@@ -43,6 +43,14 @@ int	init_rules(int ac, char *av[], t_rules *rules)
 	return (1);
 }
 
+void	unlink_semaphores(void)
+{
+	sem_unlink("/forks");
+	sem_unlink("/print");
+	sem_unlink("/dead_lock");
+	sem_unlink("/meal_lock");
+}
+
 int	init_semaphores(t_rules *rules)
 {
 	unlink_semaphores();
@@ -58,16 +66,6 @@ int	init_semaphores(t_rules *rules)
 	}
 	return (1);
 }
-
-
-void	unlink_semaphores(void)
-{
-	sem_unlink("/forks");
-	sem_unlink("/print");
-	sem_unlink("/dead_lock");
-	sem_unlink("/meal_lock");
-}
-
 
 int	init_philos(t_rules *rules)
 {
@@ -87,6 +85,75 @@ int	init_philos(t_rules *rules)
 	}
 	return (1);
 }
+void	*monitor(void *arg)
+{
+	t_rules	*rules;
+	int		full;
+	int		i;
+	long long	current_time;
+
+	rules = (t_rules *)arg;
+	while (1)
+	{
+		full = 0;
+		i = 0;
+		while (i < rules->nb_philo)
+		{
+			sem_wait(rules->meal_check);
+			current_time = timestamp(rules);
+			if (current_time - rules->philos[i].last_meal > rules->time_to_die)
+			{
+				sem_wait(rules->print_lock);
+				printf("%lld %d died\n", current_time - rules->start_time, rules->philos[i].id);
+				sem_post(rules->print_lock);
+				sem_wait(rules->dead_lock);
+				rules->someone_died = 1;
+				sem_post(rules->dead_lock);
+				exit(1);
+			}
+			sem_post(rules->meal_check);
+			if (rules->philos[i].n_eat >= rules->must_eat && rules->must_eat != -1)
+				full++;
+			i++;
+		}
+		if (full == rules->nb_philo)
+		{
+			sem_wait(rules->dead_lock);
+			rules->someone_died = 0;
+			sem_post(rules->dead_lock);
+			exit(0);
+		}
+		usleep(1000);
+	}
+	return (NULL);
+}
+
+
+void	philo_routine(t_philo *philo)
+{
+	while (1)
+	{
+		sem_wait(philo->rules->forks);
+		print("has taken a fork", philo);
+		sem_wait(philo->rules->forks);
+		print("has taken a fork", philo);
+		sem_post(philo->rules->forks);
+		sem_post(philo->rules->forks);
+		sem_wait(philo->rules->meal_check);
+		philo->last_meal = timestamp(philo->rules);
+		sem_post(philo->rules->meal_check);
+		print("is eating", philo);
+		sleep(philo->rules->time_to_eat);
+		philo->n_eat++;
+		print("is sleeping", philo);
+		sleep(philo->rules->time_to_sleep);
+		print("is thinking", philo);
+		if (philo->rules->must_eat != -1 && philo->n_eat >= philo->rules->must_eat)
+			exit(1);
+	}
+}
+
+
 
 int	launch_philos(t_rules *rules)
 {
@@ -112,43 +179,20 @@ int	launch_philos(t_rules *rules)
 	return (1);
 }
 
-void	philo_routine(t_philo *philo)
+int	main(int ac, char **av)
 {
-	while (1)
-	{
-		sem_wait(philo->rules->forks);
-		print("has taken a fork");
-		sem_wait(philo->rules->forks);
-		print("has taken a fork");
-		sem_wait(philo->rules->meal_check);
-		philo->last_meal = timestamp(philo->rules);
-		sem_post(philo->rules->meal_check);
-		print("is eating");
-		sleep(philo->rules->time_to_eat);
-		philo->n_eat++;
-		sem_post(philo->rules->forks);
-		sem_post(philo->rules->forks);
-		print("is sleeping");
-		sleep(philo->rules->time_to_sleep);
-		print("is thinking");
-		if (philo->rules->must_eat != -1 && philo->n_eat >= philo->rules->must_eat)
-			exit(0);
-	}
+	t_rules	rules;
+
+	if (!init_rules(ac, av, &rules))
+		return (1);
+	if (!init_semaphores(&rules))
+		return (2);
+	if (!init_philos(&rules))
+		return (3);
+	if (!launch_philos(&rules))
+		return (4);
+	wait_processes(&rules);
+	cleanup(&rules);
+	return (0);
 }
 
-void *monitor(void *arg)
-{
-    t_rules *rules;
-    int full;
-    int i;
-    long long current_time;
-
-	rules = (t_rules *)arg;
-	while (1)
-    {
-        full = 0;
-        i = 0;
-	}
-
-
-}

@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 19:56:58 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/16 11:45:26 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/18 15:50:36 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,29 +72,22 @@ int	check_if_died(t_philo *philo)
 	return (1);
 }
 
-int	take_fork(t_philo *philo, pthread_mutex_t **first, pthread_mutex_t **second)
+int	take_fork(t_philo *philo)
 {
-	if (philo->left_fork < philo->right_fork)
-	{
-		*first = philo->left_fork;
-		*second = philo->right_fork;
-	}
-	else
-	{
-		*first = philo->right_fork;
-		*second = philo->left_fork;
-	}
-	pthread_mutex_lock(*first);
+	if (philo->id % 2 == 0)
+		usleep(100);
+	pthread_mutex_lock(philo->right_fork);
+	pthread_mutex_lock(philo->left_fork);
 	if (!print_status(philo, "has taken a fork"))
 	{
-		pthread_mutex_unlock(*first);
+		pthread_mutex_unlock(philo->right_fork);
+		pthread_mutex_unlock(philo->left_fork);
 		return (0);
 	}
-	pthread_mutex_lock(*second);
 	if (!print_status(philo, "has taken a fork"))
 	{
-		pthread_mutex_unlock(*second);
-		pthread_mutex_unlock(*first);
+		pthread_mutex_unlock(philo->right_fork);
+		pthread_mutex_unlock(philo->left_fork);
 		return (0);
 	}
 	return (1);

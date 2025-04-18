@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 18:55:06 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/16 11:46:54 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/18 15:23:33 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,7 @@ long long	timestamp(t_rules *rules);
 int			init_forks_and_philos(t_rules *rules);
 int			print_status(t_philo *philo, const char *msg);
 int			check_if_died(t_philo *philo);
-int			take_fork(t_philo *philo, pthread_mutex_t **first,
-				pthread_mutex_t **second);
+int			take_fork(t_philo *philo);
 int			destroy_and_free(t_rules *rules);
 void		*monitor(void *arg);
 
