@@ -137,12 +137,12 @@ void	philo_routine(t_philo *philo)
 		print("has taken a fork", philo);
 		sem_wait(philo->rules->forks);
 		print("has taken a fork", philo);
-		sem_post(philo->rules->forks);
-		sem_post(philo->rules->forks);
 		sem_wait(philo->rules->meal_check);
 		philo->last_meal = timestamp(philo->rules);
 		sem_post(philo->rules->meal_check);
 		print("is eating", philo);
+		sem_post(philo->rules->forks);
+		sem_post(philo->rules->forks);
 		sleep(philo->rules->time_to_eat);
 		philo->n_eat++;
 		print("is sleeping", philo);

@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 19:11:55 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/18 15:23:59 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/18 17:46:55 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,10 @@ void	*philo_routine(void *arg)
 		pthread_mutex_unlock(philo->right_fork);
 		if (!print_status(philo, "is sleeping"))
 			return (NULL);
-		usleep(philo->rules->time_to_sleep * 1000);
+		if (philo->rules->time_to_sleep > philo->rules->time_to_die)
+			usleep(philo->rules->time_to_die * 1000);
+		else
+			usleep(philo->rules->time_to_sleep * 1000);
 		if (!print_status(philo, "is thinking"))
 			return (NULL);
 	}
