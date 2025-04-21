@@ -42,7 +42,7 @@ void	wait_processes(t_rules *rules)
 	i = 0;
 	while (i < rules->nb_philo)
 	{
-		waitpid(rules->pids[i], &status, 0);
+		waitpid(-1, &status, 0);
 		if (WIFEXITED(status) && WEXITSTATUS(status) == 1)
 		{
 			kill_all(rules);

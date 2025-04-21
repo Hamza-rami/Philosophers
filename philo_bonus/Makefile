@@ -4,7 +4,7 @@ SRC = philo_bonus.c utils.c
 
 INC = philo_bonus.h
 OBJS = ${SRC:.c=.o}
-CC = cc -Wall -Werror -Wextra
+CC = cc -Wall -Werror -Wextra # -fsanitize=address -g3
 RM = rm -f
 
 all: ${NAME}

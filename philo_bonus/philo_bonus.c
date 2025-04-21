@@ -87,42 +87,26 @@ int	init_philos(t_rules *rules)
 }
 void	*monitor(void *arg)
 {
-	t_rules	*rules;
-	int		full;
-	int		i;
-	long long	current_time;
+	t_philo	*philo;
+	long long		current_time;
 
-	rules = (t_rules *)arg;
+	philo = (t_philo *)arg;
 	while (1)
 	{
-		full = 0;
-		i = 0;
-		while (i < rules->nb_philo)
+		sem_wait(philo->rules->meal_check);
+		current_time = timestamp(philo->rules);
+		if (current_time - philo->last_meal > philo->rules->time_to_die)
 		{
-			sem_wait(rules->meal_check);
-			current_time = timestamp(rules);
-			if (current_time - rules->philos[i].last_meal > rules->time_to_die)
-			{
-				sem_wait(rules->print_lock);
-				printf("%lld %d died\n", current_time - rules->start_time, rules->philos[i].id);
-				sem_post(rules->print_lock);
-				sem_wait(rules->dead_lock);
-				rules->someone_died = 1;
-				sem_post(rules->dead_lock);
-				exit(1);
-			}
-			sem_post(rules->meal_check);
-			if (rules->philos[i].n_eat >= rules->must_eat && rules->must_eat != -1)
-				full++;
-			i++;
+			sem_wait(philo->rules->print_lock);
+			printf("%lld %d died\n", current_time - philo->rules->start_time, philo->id);
+			sem_post(philo->rules->print_lock);
+			sem_wait(philo->rules->dead_lock);
+			philo->rules->someone_died = 1;
+			sem_post(philo->rules->dead_lock);
+			sem_post(philo->rules->meal_check);
+			exit(1);
 		}
-		if (full == rules->nb_philo)
-		{
-			sem_wait(rules->dead_lock);
-			rules->someone_died = 0;
-			sem_post(rules->dead_lock);
-			exit(0);
-		}
+		sem_post(philo->rules->meal_check);
 		usleep(1000);
 	}
 	return (NULL);
@@ -131,22 +115,24 @@ void	*monitor(void *arg)
 
 void	philo_routine(t_philo *philo)
 {
+	if (philo->id % 2 == 0)
+		usleep(300);
 	while (1)
 	{
 		sem_wait(philo->rules->forks);
-		print("has taken a fork", philo);
 		sem_wait(philo->rules->forks);
+		print("has taken a fork", philo);
 		print("has taken a fork", philo);
 		sem_wait(philo->rules->meal_check);
 		philo->last_meal = timestamp(philo->rules);
 		sem_post(philo->rules->meal_check);
 		print("is eating", philo);
+		usleep(philo->rules->time_to_eat * 1000);
 		sem_post(philo->rules->forks);
 		sem_post(philo->rules->forks);
-		sleep(philo->rules->time_to_eat);
 		philo->n_eat++;
 		print("is sleeping", philo);
-		sleep(philo->rules->time_to_sleep);
+		usleep(philo->rules->time_to_sleep * 1000);
 		print("is thinking", philo);
 		if (philo->rules->must_eat != -1 && philo->n_eat >= philo->rules->must_eat)
 			exit(1);
@@ -154,10 +140,10 @@ void	philo_routine(t_philo *philo)
 }
 
 
-
 int	launch_philos(t_rules *rules)
 {
 	int	i;
+	pthread_t	thread;
 
 	rules->pids = malloc(sizeof(pid_t) * rules->nb_philo);
 	if (!rules->pids)
@@ -171,7 +157,9 @@ int	launch_philos(t_rules *rules)
 			return (0);
 		else if (rules->pids[i] == 0)
 		{
+			pthread_create(&thread, NULL, monitor, &rules->philos[i]);
 			philo_routine(&rules->philos[i]);
+			pthread_join(thread, NULL);
 			exit(0);
 		}
 		i++;
