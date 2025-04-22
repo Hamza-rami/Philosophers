@@ -1,4 +1,4 @@
-NAME = phillo
+NAME = philo
 
 SRC = philo_utils.c philo.c utils.c monitor.c
 

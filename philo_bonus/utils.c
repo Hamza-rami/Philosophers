@@ -1,69 +1,58 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/21 14:41:55 by hrami             #+#    #+#             */
+/*   Updated: 2025/04/21 16:44:47 by hrami            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo_bonus.h"
 
-long long	timestamp(t_rules *rules)
+int	help_init_rules(int ac, char *av[], t_rules *rules)
 {
 	struct timeval	tv;
 
-	(void)rules;
-	gettimeofday(&tv, NULL);
-	return ((tv.tv_sec * 1000 + tv.tv_usec / 1000));
-}
-
-void	print(char *str, t_philo *philo)
-{
-	long long	time;
-
-	sem_wait(philo->rules->print_lock);
-	time = timestamp(philo->rules);
-	sem_wait(philo->rules->dead_lock);
-	if (!philo->rules->someone_died)
-		printf("%lld %d %s\n", time - philo->rules->start_time, philo->id, str);
-	sem_post(philo->rules->dead_lock);
-	sem_post(philo->rules->print_lock);
-}
-
-void	kill_all(t_rules *rules)
-{
-	int	i;
-
-	i = 0;
-	while (i < rules->nb_philo)
+	if (ac == 6)
 	{
-		kill(rules->pids[i], SIGKILL);
-		i++;
-	}
-}
-
-void	wait_processes(t_rules *rules)
-{
-	int	i;
-	int	status;
-
-	i = 0;
-	while (i < rules->nb_philo)
-	{
-		waitpid(-1, &status, 0);
-		if (WIFEXITED(status) && WEXITSTATUS(status) == 1)
+		rules->must_eat = ft_atoi(av[5]);
+		if (rules->must_eat < 0)
 		{
-			kill_all(rules);
-			break;
+			printf("ERROR\n");
+			return (0);
 		}
-		i++;
 	}
+	else
+		rules->must_eat = -1;
+	gettimeofday(&tv, NULL);
+	rules->start_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+	rules->someone_died = 0;
+	return (1);
 }
 
-void	cleanup(t_rules *rules)
+int	init_rules(int ac, char *av[], t_rules *rules)
 {
-	sem_close(rules->forks);
-	sem_close(rules->print_lock);
-	sem_close(rules->dead_lock);
-	sem_close(rules->meal_check);
-	sem_unlink("/forks");
-	sem_unlink("/print");
-	sem_unlink("/dead_lock");
-	sem_unlink("/meal_lock");
-	free(rules->pids);
-	free(rules->philos);
+	if (ac != 5 && ac != 6)
+	{
+		printf("ERROR : enter exact argument\n");
+		return (0);
+	}
+	rules->nb_philo = ft_atoi(av[1]);
+	rules->time_to_die = ft_atoi(av[2]);
+	rules->time_to_eat = ft_atoi(av[3]);
+	rules->time_to_sleep = ft_atoi(av[4]);
+	if (rules->nb_philo < 0 || rules->time_to_die < 0
+		|| rules->time_to_eat < 0 || rules->time_to_sleep < 0)
+	{
+		printf("ERROR\n");
+		return (0);
+	}
+	if (!help_init_rules(ac, av, rules))
+		return (0);
+	return (1);
 }
 
 static void	ft_skip(char const *str, int *s, int *i)
@@ -98,4 +87,29 @@ int	ft_atoi(char *str)
 		i++;
 	}
 	return (r * s);
+}
+
+void	*monitor(void *arg)
+{
+	t_philo			*philo;
+	long long		time;
+
+	philo = (t_philo *)arg;
+	while (1)
+	{
+		sem_wait(philo->rules->meal_check);
+		time = timestamp(philo->rules);
+		if (time - philo->last_meal > philo->rules->time_to_die)
+		{
+			sem_wait(philo->rules->print_lock);
+			printf("%lld %d died\n", time - philo->rules->start_time, philo->id);
+			sem_wait(philo->rules->dead_lock);
+			philo->rules->someone_died = 1;
+			sem_post(philo->rules->dead_lock);
+			sem_post(philo->rules->meal_check);
+			exit(1);
+		}
+		sem_post(philo->rules->meal_check);
+	}
+	return (NULL);
 }

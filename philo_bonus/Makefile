@@ -1,10 +1,10 @@
-NAME = phillo_bonus
+NAME = philo_bonus
 
-SRC = philo_bonus.c utils.c
+SRC = philo_bonus.c utils.c routine.c philo_utils.c
 
 INC = philo_bonus.h
 OBJS = ${SRC:.c=.o}
-CC = cc -Wall -Werror -Wextra # -fsanitize=address -g3
+CC = cc -Wall -Werror -Wextra
 RM = rm -f
 
 all: ${NAME}

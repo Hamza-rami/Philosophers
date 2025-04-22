@@ -1,47 +1,16 @@
-# include "philo_bonus.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_bonus.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/21 14:32:00 by hrami             #+#    #+#             */
+/*   Updated: 2025/04/21 16:52:50 by hrami            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-int	help_init_rules(int ac, char *av[], t_rules *rules)
-{
-	struct timeval	tv;
-
-	if (ac == 6)
-	{
-		rules->must_eat = ft_atoi(av[5]);
-		if (rules->must_eat < 0)
-		{
-			printf("ERROR\n");
-			return (0);
-		}
-	}
-	else
-		rules->must_eat = -1;
-	gettimeofday(&tv, NULL);
-	rules->start_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
-	rules->someone_died = 0;
-	return (1);
-}
-
-int	init_rules(int ac, char *av[], t_rules *rules)
-{
-	if (ac != 5 && ac != 6)
-	{
-		printf("ERROR : enter exact argument\n");
-		return (0);
-	}
-	rules->nb_philo = ft_atoi(av[1]);
-	rules->time_to_die = ft_atoi(av[2]);
-	rules->time_to_eat = ft_atoi(av[3]);
-	rules->time_to_sleep = ft_atoi(av[4]);
-	if (rules->nb_philo < 0 || rules->time_to_die < 0
-		|| rules->time_to_eat < 0 || rules->time_to_sleep < 0)
-	{
-		printf("ERROR\n");
-		return (0);
-	}
-	if (!help_init_rules(ac, av, rules))
-		return (0);
-	return (1);
-}
+#include "philo_bonus.h"
 
 void	unlink_semaphores(void)
 {
@@ -59,7 +28,7 @@ int	init_semaphores(t_rules *rules)
 	rules->dead_lock = sem_open("/dead_lock", O_CREAT, 0644, 1);
 	rules->meal_check = sem_open("/meal_lock", O_CREAT, 0644, 1);
 	if (rules->forks == SEM_FAILED || rules->print_lock == SEM_FAILED
-		|| rules->dead_lock == SEM_FAILED || rules->meal_check== SEM_FAILED)
+		|| rules->dead_lock == SEM_FAILED || rules->meal_check == SEM_FAILED)
 	{
 		printf("ERROR: failed to open semaphores\n");
 		return (0);
@@ -85,64 +54,10 @@ int	init_philos(t_rules *rules)
 	}
 	return (1);
 }
-void	*monitor(void *arg)
-{
-	t_philo	*philo;
-	long long		current_time;
-
-	philo = (t_philo *)arg;
-	while (1)
-	{
-		sem_wait(philo->rules->meal_check);
-		current_time = timestamp(philo->rules);
-		if (current_time - philo->last_meal > philo->rules->time_to_die)
-		{
-			sem_wait(philo->rules->print_lock);
-			printf("%lld %d died\n", current_time - philo->rules->start_time, philo->id);
-			sem_post(philo->rules->print_lock);
-			sem_wait(philo->rules->dead_lock);
-			philo->rules->someone_died = 1;
-			sem_post(philo->rules->dead_lock);
-			sem_post(philo->rules->meal_check);
-			exit(1);
-		}
-		sem_post(philo->rules->meal_check);
-		usleep(1000);
-	}
-	return (NULL);
-}
-
-
-void	philo_routine(t_philo *philo)
-{
-	if (philo->id % 2 == 0)
-		usleep(300);
-	while (1)
-	{
-		sem_wait(philo->rules->forks);
-		sem_wait(philo->rules->forks);
-		print("has taken a fork", philo);
-		print("has taken a fork", philo);
-		sem_wait(philo->rules->meal_check);
-		philo->last_meal = timestamp(philo->rules);
-		sem_post(philo->rules->meal_check);
-		print("is eating", philo);
-		usleep(philo->rules->time_to_eat * 1000);
-		sem_post(philo->rules->forks);
-		sem_post(philo->rules->forks);
-		philo->n_eat++;
-		print("is sleeping", philo);
-		usleep(philo->rules->time_to_sleep * 1000);
-		print("is thinking", philo);
-		if (philo->rules->must_eat != -1 && philo->n_eat >= philo->rules->must_eat)
-			exit(1);
-	}
-}
-
 
 int	launch_philos(t_rules *rules)
 {
-	int	i;
+	int			i;
 	pthread_t	thread;
 
 	rules->pids = malloc(sizeof(pid_t) * rules->nb_philo);
@@ -160,6 +75,7 @@ int	launch_philos(t_rules *rules)
 			pthread_create(&thread, NULL, monitor, &rules->philos[i]);
 			philo_routine(&rules->philos[i]);
 			pthread_join(thread, NULL);
+			cleanup(rules);
 			exit(0);
 		}
 		i++;
@@ -183,4 +99,3 @@ int	main(int ac, char **av)
 	cleanup(&rules);
 	return (0);
 }
-
