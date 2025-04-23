@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 14:32:00 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/21 16:52:50 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/23 10:04:03 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,11 +90,11 @@ int	main(int ac, char **av)
 	if (!init_rules(ac, av, &rules))
 		return (1);
 	if (!init_semaphores(&rules))
-		return (2);
+		return (1);
 	if (!init_philos(&rules))
-		return (3);
+		return (1);
 	if (!launch_philos(&rules))
-		return (4);
+		return (1);
 	wait_processes(&rules);
 	cleanup(&rules);
 	return (0);

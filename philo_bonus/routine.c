@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 14:46:32 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/21 16:53:40 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/23 10:08:34 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	philo_routine(t_philo *philo)
 {
 	if (philo->id % 2 == 0)
-		usleep(300);
+		usleep(100);
 	while (1)
 	{
 		sem_wait(philo->rules->forks);
