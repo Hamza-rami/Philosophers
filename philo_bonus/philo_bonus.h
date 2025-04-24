@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 14:40:15 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/21 14:50:22 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/24 15:06:11 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,5 +61,6 @@ int			ft_atoi(char *str);
 void		*monitor(void *arg);
 void		philo_routine(t_philo *philo);
 int			init_rules(int ac, char *av[], t_rules *rules);
+void		ft_usleep(long time, t_rules *rules);
 
 #endif
