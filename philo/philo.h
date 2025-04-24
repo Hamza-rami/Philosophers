@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 18:55:06 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/18 15:23:33 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/24 15:48:37 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,5 +61,6 @@ int			check_if_died(t_philo *philo);
 int			take_fork(t_philo *philo);
 int			destroy_and_free(t_rules *rules);
 void		*monitor(void *arg);
+void		ft_usleep(long time, t_rules *rules);
 
 #endif
