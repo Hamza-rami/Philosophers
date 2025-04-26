@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 19:11:55 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/24 15:41:00 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/26 10:40:19 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ void	*philo_routine(void *arg)
 	t_philo			*philo;
 
 	philo = (t_philo *)arg;
+	if (philo->id % 2 == 0)
+		usleep(100);
 	while (1)
 	{
 		if (philo->rules->must_eat != -1
