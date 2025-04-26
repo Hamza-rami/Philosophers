@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 10:03:03 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/24 15:49:00 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/26 11:06:57 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,5 +79,5 @@ void	ft_usleep(long time, t_rules *rules)
 
 	start = timestamp(rules);
 	while ((timestamp(rules) - start) < time)
-		usleep(500);
+		usleep(10);
 }

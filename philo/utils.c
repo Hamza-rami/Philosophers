@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 19:56:58 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/26 10:39:58 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/26 11:02:42 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,13 +76,13 @@ int	take_fork(t_philo *philo)
 {
 	if (philo->id % 2 == 0)
 	{
-	    pthread_mutex_lock(philo->left_fork);
-	    pthread_mutex_lock(philo->right_fork);
+		pthread_mutex_lock(philo->left_fork);
+		pthread_mutex_lock(philo->right_fork);
 	}
 	else
 	{
-	    pthread_mutex_lock(philo->right_fork);
-	    pthread_mutex_lock(philo->left_fork);
+		pthread_mutex_lock(philo->right_fork);
+		pthread_mutex_lock(philo->left_fork);
 	}
 	if (!print_status(philo, "has taken a fork"))
 	{

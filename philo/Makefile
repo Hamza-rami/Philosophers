@@ -4,7 +4,7 @@ SRC = philo_utils.c philo.c utils.c monitor.c
 
 INC = philo/philo.h
 OBJS = ${SRC:.c=.o}
-CC = cc -Wall -Werror -Wextra
+CC = cc -Wall -Werror -Wextra -fsanitize=thread -g3
 RM = rm -f
 
 all: ${NAME}
