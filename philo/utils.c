@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 19:56:58 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/26 11:02:42 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/30 13:23:29 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	init_forks_and_philos(t_rules *rules)
 		return (0);
 	rules->philos = malloc(sizeof(t_philo) * rules->nb_philo);
 	if (!rules->philos)
-		return (0);
+		return (free(rules->philos), 0);
 	i = 0;
 	while (i < rules->nb_philo)
 	{

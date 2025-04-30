@@ -6,7 +6,7 @@
 /*   By: hrami <hrami@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 14:32:00 by hrami             #+#    #+#             */
-/*   Updated: 2025/04/23 10:04:03 by hrami            ###   ########.fr       */
+/*   Updated: 2025/04/30 14:58:36 by hrami            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int	launch_philos(t_rules *rules)
 		rules->philos[i].last_meal = timestamp(rules);
 		rules->pids[i] = fork();
 		if (rules->pids[i] < 0)
-			return (0);
+			return (free(rules->pids), 0);
 		else if (rules->pids[i] == 0)
 		{
 			pthread_create(&thread, NULL, monitor, &rules->philos[i]);
@@ -94,7 +94,7 @@ int	main(int ac, char **av)
 	if (!init_philos(&rules))
 		return (1);
 	if (!launch_philos(&rules))
-		return (1);
+		return (free(rules.philos), 1);
 	wait_processes(&rules);
 	cleanup(&rules);
 	return (0);
