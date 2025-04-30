@@ -2,7 +2,7 @@ NAME = philo
 
 SRC = philo_utils.c philo.c utils.c monitor.c
 
-INC = philo/philo.h
+INC = philo.h
 OBJS = ${SRC:.c=.o}
 CC = cc -Wall -Werror -Wextra
 RM = rm -f
